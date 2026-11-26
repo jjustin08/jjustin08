@@ -4,7 +4,7 @@
 
 I'm a game programmer and founder of Finite Games Studio, developing gameplay systems, multiplayer architecture and AI for 2D and 3D games. I graduated from George Brown College with an Ontario College Advanced Diploma in Game Programming in 2024.
 
-[Portfolio website](https://justin-bennett-portfolio.my.canva.site/)
+[Portfolio website](https://justin-bennett-portfolio.my.canva.site/) · [Résumé (PDF)](https://drive.google.com/file/d/1fUo10qgrNG2dJt7AgLXs73EXY6QeAU2D/view?usp=drivesdk)
 
 ## Technical focus
 
