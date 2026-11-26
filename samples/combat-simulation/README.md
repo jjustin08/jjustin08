@@ -1,6 +1,6 @@
 # Kami — Shared client/server combat simulation
 
-Selected source-code excerpts from **Kami**, a Unity/C# multiplayer auto-battler developed at Finite Games Studio. These are excerpts of the original project implementation, not a recreated demo. Only surrounding class members and indentation/whitespace have been omitted or adjusted.
+Selected source-code excerpts from **Kami**, a Unity/C# multiplayer auto-battler developed at Finite Games Studio. These are excerpts of the original project implementation, not a recreated demo. Surrounding class members are omitted; formatting and comments have been cleaned up for readability without changing the implementation.
 
 ## Problem and contribution
 
@@ -23,7 +23,6 @@ public static void FixedCombatUpdate()
 
     while (accumulatedTime >= timeStep)
     {
-
         if (SH_CombatSimulator.IsCombatOver())
         {
             isCombatActive = false;
@@ -44,8 +43,7 @@ Source: `SH_CombatSimulator.cs`. The server runs the same simulation loop withou
 ```csharp
 public static int InstantCombatSimulation()
 {
-
-    while(!IsCombatOver())
+    while (!IsCombatOver())
     {
         CombatUpdate();
     }
@@ -66,7 +64,7 @@ public static int InstantCombatSimulation()
 
     int tempIterations = iterations;
     Reset();
-    return tempIterations; // Return iteration count
+    return tempIterations;
 }
 ```
 
@@ -84,13 +82,11 @@ public static void CombatUpdate()
     {
         if (pawn.GetStats().GetCurrentHealth() > 0)
         {
-            pawn.GetStats().StatsUpdate(timeStep); // Update buffs
-            pawn.GetAI().AiUpdate(timeStep, pawns, newPawns); // Pass currentTime for logging
+            pawn.GetStats().StatsUpdate(timeStep);
+            pawn.GetAI().AiUpdate(timeStep, pawns, newPawns);
         }
-
     }
-    SH_AbilityEffects.UpdateEffects(timeStep, pawns, newPawns); // Update ability effects
-
+    SH_AbilityEffects.UpdateEffects(timeStep, pawns, newPawns);
 
     pawns.AddRange(newPawns);
 }
@@ -103,7 +99,7 @@ Source: `SH_CombatSimulator.cs`. Combat ends when one side has no surviving pawn
 ```csharp
 public static bool IsCombatOver()
 {
-    if (iterations >= maxIterations) // Enforce max duration
+    if (iterations >= maxIterations)
     {
         return true;
     }
