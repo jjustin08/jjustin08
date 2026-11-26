@@ -1,6 +1,6 @@
 # Gods Gather — Modular attack abilities
 
-Selected original C# source from Gods Gather, a Unity third-person action roguelite prototype. The excerpts below retain the original code; surrounding members and formatting have been omitted where indicated. The project history records my work on the ability refactor, attack execution and the Flurry ability.
+Selected original C# source from Gods Gather, a Unity third-person action roguelite prototype. The excerpts retain the original implementation, with surrounding members omitted and formatting and comments cleaned up for readability. The project history records my work on the ability refactor, attack execution and the Flurry ability.
 
 ## Design
 
@@ -59,7 +59,7 @@ public abstract class AttackAbility : IAbility
         IsActive = false;
     }
 
-    protected abstract AttackData CreateData();  // Subclasses must implement this for their hit phases
+    protected abstract AttackData CreateData();
 
     protected Vector3 GetAttackDirection(Character_Controller controller)
     {
@@ -77,7 +77,7 @@ public abstract class AttackAbility : IAbility
         return (right * input.x + forward * input.y).normalized;
     }
 
-    public virtual float GetUtilityScore(Character_Controller controller,Transform target,float distance,float healthPct)
+    public virtual float GetUtilityScore(Character_Controller controller, Transform target, float distance, float healthPct)
     {
         return 1;
     }
@@ -86,7 +86,7 @@ public abstract class AttackAbility : IAbility
 
 ### 2. Concrete multi-hit ability
 
-Source: `FlurryAbility.cs`. Three hit phases describe a sequence of spherical hits at different wind-up times. Each uses the same executor without implementing its own collision loop. The numeric phase arguments are the actual timings; the original inline timing comments are stale.
+Source: `FlurryAbility.cs`. Three hit phases describe a sequence of spherical hits at different wind-up times. Each uses the same executor without implementing its own collision loop. The phase arguments configure wind-up, countdown and telegraph visibility.
 
 ```csharp
 using UnityEngine;
@@ -95,18 +95,17 @@ using UnityEngine;
 public class FlurryAbility : AttackAbility
 {
     public override float cooldown => 5f;
-    public override float activeDuration => 2.0f; // Total anim time: windUp + countdown
+    public override float activeDuration => 2.0f;
 
-    public override float windUp => 0.2f; // not used here
-    public override float countdown => 0.1f; // not used here
-    public override float unWind => 0.1f; // not used here
+    public override float windUp => 0.2f;
+    public override float countdown => 0.1f;
+    public override float unWind => 0.1f;
     public FlurryAbility(Character_Progression stats, AttackExecutor exec) : base(stats, exec) { }
 
     protected override AttackData CreateData()
     {
         AttackData data = new AttackData();
-        // Phase 1: Quick first hit, invisible
-        HitPhase hit1 = new HitPhase(0.4f, 0.1f, false); // Appear at 0.2s, damage after 0.1s countdown (at 0.3s)
+        HitPhase hit1 = new HitPhase(0.4f, 0.1f, false);
         hit1.volumes.Add(new HitVolume(
             Vector3.forward * 1.5f,
             Quaternion.Euler(0, 0, 90f),
@@ -116,8 +115,7 @@ public class FlurryAbility : AttackAbility
             Vector3.forward * 0f
         ));
         data.hitPhases.Add(hit1);
-        // Phase 2
-        HitPhase hit2 = new HitPhase(0.8f, 0.1f, false); // Appear at 0.6s, damage at 0.7s
+        HitPhase hit2 = new HitPhase(0.8f, 0.1f, false);
         hit2.volumes.Add(new HitVolume(
             Vector3.forward * 1.5f,
             Quaternion.Euler(0, 0, 90f),
@@ -127,8 +125,7 @@ public class FlurryAbility : AttackAbility
             Vector3.forward * 0f
         ));
         data.hitPhases.Add(hit2);
-        // Phase 3
-        HitPhase hit3 = new HitPhase(1.4f, 0.1f, false); // Appear at 1.0s, damage at 1.1s
+        HitPhase hit3 = new HitPhase(1.4f, 0.1f, false);
         hit3.volumes.Add(new HitVolume(
             Vector3.forward * 1.5f,
             Quaternion.Euler(0, 0, 90f),
@@ -189,7 +186,7 @@ private void Update()
             pt.activeRemaining = pt.phase.countdownTime;
             pt.originalCountdown = pt.phase.countdownTime;
             pt.resolved = false;
-            hitIdsThisAttack.Clear(); // Clear for new phase
+            hitIdsThisAttack.Clear(); // Reset hit tracking for the new phase
             if (pt.phase.visible)
             {
                 foreach (var vol in pt.phase.volumes)
@@ -215,7 +212,6 @@ private void Update()
 
                     if (vol.shape == HitShape.Projectile && projectilePrefab != null)
                     {
-                        // Spawn projectile instead of overlap check
                         GameObject projObj = Instantiate(projectilePrefab, worldPos, worldRot);
                         Projectile proj = projObj.GetComponent<Projectile>();
 
@@ -225,10 +221,9 @@ private void Update()
                             proj.knockbackForce = vol.knockback;
                             proj.attacker = gameObject;
                             proj.attackerId = characterId;
-                            proj.speed = vol.size.y;           // Using size.y for speed
-                            proj.lifetime = vol.size.z;        // Using size.z for lifetime
-                                                               // Optional: scale the visual if desired
-                            proj.transform.localScale = new Vector3(vol.size.x, vol.size.x, vol.size.x); // uniform scale from radius
+                            proj.speed = vol.size.y; // Projectile speed
+                            proj.lifetime = vol.size.z; // Projectile lifetime
+                            proj.transform.localScale = new Vector3(vol.size.x, vol.size.x, vol.size.x); // Uniform scale from radius
                         }
                         else
                         {
@@ -238,7 +233,6 @@ private void Update()
                     }
                     else
                     {
-                        // Original area/overlap behavior for Box, Sphere, Capsule, Cone
                         int hits = GetOverlaps(vol, worldPos, worldRot, overlapResults, hitLayerMask);
                         ProcessHits(hits, worldPos, worldRot, vol);
                     }
@@ -251,7 +245,6 @@ private void Update()
             }
         }
     }
-    // End early if all phases done
     bool allDone = true;
     for (int i = 0; i < phaseTimers.Count; i++)
     {
@@ -279,7 +272,6 @@ private int GetOverlaps(HitVolume vol, Vector3 worldPos, Quaternion worldRot, Co
     }
     else if (vol.shape == HitShape.Cone)
     {
-        // Use sphere for candidates
         float coneLength = vol.size.x;
         float coneAngleDeg = vol.size.y;
         float maxRadius = coneLength * Mathf.Tan(coneAngleDeg * Mathf.Deg2Rad / 2f);
