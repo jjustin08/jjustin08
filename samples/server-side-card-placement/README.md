@@ -1,6 +1,6 @@
 # Ascending Flags — Server-side card placement
 
-Selected original Unity/C# code from Ascending Flags, a multiplayer tactical card and board game. The project history records my contributions to networked card placement and validation. Excerpts preserve the original implementation, with only whitespace and surrounding class members omitted.
+Selected original Unity/C# code from Ascending Flags, a multiplayer tactical card and board game. The project history records my contributions to networked card placement and validation. Excerpts preserve the original implementation, with surrounding class members omitted and formatting and comments cleaned up for readability.
 
 ## Design
 
@@ -26,9 +26,9 @@ Source: `ServerPlaceCards.cs`. The client does not supply the card's mana cost o
 [ServerRpc(RequireOwnership = false)]
 private void PlaceCardServerRpc(int cardIndex, NetworkObjectReference tileSlotNetworkObjectReference, ServerRpcParams serverRpcParams = default)
 {
-ulong playerID = serverRpcParams.Receive.SenderClientId;
+    ulong playerID = serverRpcParams.Receive.SenderClientId;
 
-ExtraPlaceCard(cardIndex, tileSlotNetworkObjectReference, playerID);
+    ExtraPlaceCard(cardIndex, tileSlotNetworkObjectReference, playerID);
 }
 
 public void ExtraPlaceCard(int cardIndex, NetworkObjectReference tileSlotNetworkObjectReference, ulong playerID)
@@ -40,18 +40,14 @@ public void ExtraPlaceCard(int cardIndex, NetworkObjectReference tileSlotNetwork
 
     cardSO = cardManager.GetHand(playerID)[cardIndex];
 
-
     if (!PlacingCardChecks(playerID, cardSO, tileSlot))
     {
         return;
     }
 
-    // use mana
     manaManager.UseMana(playerID, cardSO.manaCost);
 
-
     GameObject placedObject = null;
-    // figure out what type of card
     if (cardSO is UnitCardSO)
     {
         UnitCardSO unitCardSO = cardSO as UnitCardSO;
@@ -65,7 +61,6 @@ public void ExtraPlaceCard(int cardIndex, NetworkObjectReference tileSlotNetwork
     }
     else
     {
-        // need to put check here for trainer and other kinds of cards
         return;
     }
 
@@ -86,20 +81,16 @@ public bool PlacingCardChecks(ulong playerID, _CardBaseSO cardSO, TileSlot tileS
     {
         return false;
     }
-    // figure out what type of card
     if (cardSO is UnitCardSO)
     {
-        // if tile is placed
         if (tileSlot.GetTileInfo() == null)
         {
             return false;
         }
-        // if tile is yours
         if (tileSlot.GetTileInfo().GetPlayerOwnerShip().GetOwnerShip() != playerID)
         {
             return false;
         }
-        // if unit already there
         if (tileSlot.GetUnit() != null)
         {
             return false;
@@ -107,24 +98,20 @@ public bool PlacingCardChecks(ulong playerID, _CardBaseSO cardSO, TileSlot tileS
     }
     else if (cardSO is TileCardSO)
     {
-        // if tile slot is empty
         if (tileSlot.GetTileInfo() != null)
         {
             return false;
         }
-        // TODO: if slot is visible
     }
     else
     {
         return false;
-
     }
 
     if (manaManager.GetMana(playerID) < cardSO.manaCost)
     {
         return false;
     }
-
 
     return true;
 }
@@ -146,8 +133,6 @@ private GameObject SpawnUnit(UnitCardSO unitCardSO, TileSlot tileSlot, ulong pla
     newUnit.GetComponent<UnitInfo>().SetCardBaseSO(unitCardSO);
     tileSlot.SetUnit(newUnit.GetComponent<UnitInfo>());
 
-
-    // redo this please
     if (playerID == PLAYER_ONE)
     {
         newUnit.GetComponent<UnitVisualController>().ChangeMaterialOnBase(player1MAT);
