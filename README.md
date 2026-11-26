@@ -4,6 +4,8 @@
 
 I'm a game programmer and founder of Finite Games Studio, developing gameplay systems, multiplayer architecture and AI for 2D and 3D games. I graduated from George Brown College with an Ontario College Advanced Diploma in Game Programming in 2024.
 
+[Portfolio website](https://justin-bennett-portfolio.my.canva.site/)
+
 ## Technical focus
 
 - **Gameplay programming:** character controllers, abilities, combat systems and game-state management
@@ -22,4 +24,8 @@ I'm a game programmer and founder of Finite Games Studio, developing gameplay sy
 | Blazing Chaos | Game jam project; fire propagation and firefighter behaviour |
 | WARP | 2D game developed with C++ and SDL2 |
 
-Full game source repositories are private. Public, self-contained code samples will be added as separate repositories.
+## Public code showcases
+
+- [Fixed-step combat simulation](samples/combat-simulation) — selected original C# source excerpts from Kami showing shared simulation rules, instant server-side resolution and fixed-step client execution.
+
+Full game source repositories remain private.
