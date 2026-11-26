@@ -28,4 +28,7 @@ I'm a game programmer and founder of Finite Games Studio, developing gameplay sy
 
 - [Fixed-step combat simulation](samples/combat-simulation) — selected original C# source excerpts from Kami showing shared simulation rules, instant server-side resolution and fixed-step client execution.
 
+- [Modular attack abilities](samples/modular-ability-system) — original Gods Gather C# code showing an abstract ability base, multi-hit attack configuration and shared attack execution.
+- [Server-side card placement](samples/server-side-card-placement) — original Ascending Flags C# code showing Unity Netcode RPCs, server-side game-rule checks and networked object spawning.
+
 Full game source repositories remain private.
